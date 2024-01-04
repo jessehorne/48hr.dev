@@ -1,0 +1,45 @@
+{{define "bottom"}}
+<footer class="bg-white rounded-lg shadow m-4 dark:bg-gray-800 h-screen justify-between">
+    <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+          <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2024 Micro Bois Inc. All Rights Reserved.
+        </span>
+        <ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
+            <li>
+                <a href="#" class="hover:underline me-4 md:me-6">About</a>
+            </li>
+            <li>
+                <a href="#" class="hover:underline me-4 md:me-6">Privacy Policy</a>
+            </li>
+            <li>
+                <a href="#" class="hover:underline">Contact</a>
+            </li>
+        </ul>
+    </div>
+</footer>
+
+
+<!-- Insert this script at the bottom of the HTML, but before you use any Firebase services -->
+<script type="module">
+    // Add Firebase products that you want to use
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
+</script>
+
+
+<script>
+    firebaseConfig = {
+        apiKey: "{{ .creds.APIKey }}",
+        authDomain: "{{ .creds.AuthDomain }}",
+        projectId: "{{ .creds.ProjectID }}",
+        storageBucket: "{{ .creds.StorageBucket }}",
+        messagingSenderId: "{{ .creds.MessagingSenderID }}",
+        appId: "{{ .creds.AppID }}",
+        measurementId: "{{ .creds.MeasurementID }}"
+    };
+</script>
+
+</body>
+
+</html>
+
+{{end}}
