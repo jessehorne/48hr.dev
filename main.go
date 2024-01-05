@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jessehorne/microblog/mb"
@@ -15,6 +16,11 @@ func main() {
 	}
 	
 	debug := true
+	if os.Getenv("APP_DEBUG") == "true" {
+		debug = true
+	} else {
+		debug = false
+	}
 	mb.InitApp(debug)
 
 	r := gin.Default()
@@ -26,13 +32,12 @@ func main() {
 	r.NoRoute(gin.WrapH(http.FileServer(gin.Dir("public", false))))
 
 	//// Auth'd API routes
-	//var api *gin.RouterGroup
-	//
-	//if debug {
-	//	api = r.Group("/api")
-	//} else {
-	//	api = r.Group("/api", mb.FirebaseAuthMiddleware)
-	//}
+	var api *gin.RouterGroup
+
+	api = r.Group("/api")
+	
+	api.Use(mb.FirebaseAuthMiddleware)
+	api.POST("/projects", mb.PostProject)
 
 	// Web Routes
 	r.GET("/", func(c *gin.Context) {
@@ -49,6 +54,12 @@ func main() {
 
 	r.GET("/post", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "post.html", gin.H{
+			"creds": mb.GetFirebaseClientCredentials(),
+		})
+	})
+
+	r.GET("/projects", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "projects.html", gin.H{
 			"creds": mb.GetFirebaseClientCredentials(),
 		})
 	})

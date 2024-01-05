@@ -32,11 +32,15 @@ var applyAsInfra = `
 var cardTmpl = `
    <div class="max-w-screen-xl rounded-lg border border-gray-200 overflow-hidden shadow-md bg-white p-4">
         <div class="p-4">
-            <h5 class="text-2xl font-bold tracking-tight text-gray-900">{{Title}}</h5>
+            <div class="flex flex-row">
+            <h5 class="basis-1/3 text-2xl font-bold tracking-tight text-gray-900">{{Title}}</h5>
+            <p class="basis-2/3 text-right">created on {{CreatedAt}}</p>
+            </div>
             <p class="mb-3 font-normal text-gray-700">{{Short}}</p>
             {{NeedsBackend}}
             {{NeedsFrontend}}
             {{NeedsInfra}}
+            <p class="mb-3 font-normal"><a href="/user/{{UserID}}">by {{DisplayName}}</a></p>
         </div>
     </div>
    `
@@ -55,27 +59,26 @@ function buildNeeds(projectId, which) {
     return tmpl.replace("{{ProjectID}}", projectId).replace("{{Which}}", which);
 }
 
-function buildCard(projectId, title, short, needsBackend, needsFrontend, needsInfra) {
+function buildCard(p) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(p.CreatedAt);
+
     return cardTmpl
-        .replace("{{Title}}", title ? title : "")
-        .replace("{{Short}}", short ? short : "")
-        .replace("{{NeedsBackend}}", needsBackend ? buildNeeds(projectId, "backend") : "")
-        .replace("{{NeedsFrontend}}", needsFrontend ? buildNeeds(projectId, "frontend") : "")
-        .replace("{{NeedsInfra}}", needsInfra ? buildNeeds(projectId, "infra") : "")
-        .replace("{{ProjectID}}", projectId)
+        .replace("{{Title}}", p.Title ? p.Title : "")
+        .replace("{{Short}}", p.Short ? p.Short : "")
+        .replace("{{NeedsBackend}}", p.NeedsBackend ? buildNeeds(p.ProjectId, "backend") : "")
+        .replace("{{NeedsFrontend}}", p.NeedsFrontend ? buildNeeds(p.ProjectId, "frontend") : "")
+        .replace("{{NeedsInfra}}", p.NeedsInfra ? buildNeeds(p.ProjectId, "infra") : "")
+        .replace("{{ProjectID}}", p.ProjectId)
+        .replace("{{CreatedAt}}", formattedDate)
+        .replace("{{UserID}}", p.UserID)
+        .replace("{{DisplayName}}", p.DisplayName)
 }
 
-function addCard(projectId, title, short, needsBackend, needsFrontend, needsInfra) {
-    $("#cards").append(
-        $(
-            buildCard(
-                projectId,
-                title,
-                short,
-                needsBackend, needsFrontend, needsInfra
-            )
-        )
-    )
+function addCard(p) {
+    if (p.title != "Centrifuge") {
+        $("#cards").append($(buildCard(p)))
+    }
 }
 
 $(document).ready(function() {
@@ -98,7 +101,7 @@ $(document).ready(function() {
             }
           qs.forEach((p) => {
               const data = p.data();
-              addCard(p.id, data.title, data.short, data.needBackend, data.needFrontend, data.needInfra);
+              addCard(data);
           });
         })
     }
@@ -148,6 +151,4 @@ $(document).ready(function() {
     if ($("#firebaseui").length) {
         ui.start('#firebaseui', uiConfig);
     }
-
-    // addCard(555, "Pooper", "Log poops daily for science, built with Go.", true, true, true);
 });
