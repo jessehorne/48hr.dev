@@ -21,14 +21,7 @@
 
 <!-- Insert this script at the bottom of the HTML, but before you use any Firebase services -->
 <script type="module">
-    // Add Firebase products that you want to use
-    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'
-    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
-</script>
-
-
-<script>
-    firebaseConfig = {
+    var firebaseConfig = {
         apiKey: "{{ .creds.APIKey }}",
         authDomain: "{{ .creds.AuthDomain }}",
         projectId: "{{ .creds.ProjectID }}",
@@ -37,6 +30,42 @@
         appId: "{{ .creds.AppID }}",
         measurementId: "{{ .creds.MeasurementID }}"
     };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            if (typeof initPost !== "undefined") {
+                initPost(firestore, user.uid);
+            }
+
+            firebase.auth().currentUser
+                .getIdToken()
+                .then(function (token) {
+                    // loop through apply buttons and apply token
+                    $(".apply-button").each(function (b) {
+                        $(this).attr("href", $(this).attr("href") + "?token=" + token)
+                    });
+                })
+
+            $("#a-projects-link").attr("href", `/users/${user.uid}/projects`);
+            $("#login-link").addClass("hidden");
+            $("#projects-link").removeClass("hidden");
+        } else {
+            $("#login-link").removeClass("hidden");
+            $("#projects-link").addClass("hidden");
+        }
+    });
+
+    // Initialize the FirebaseUI Widget using Firebase.
+    var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+    var firestore;
+    if (firebase.firestore) {
+        firestore = firebase.firestore();
+    }
 </script>
 
 </body>

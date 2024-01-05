@@ -8,8 +8,11 @@ import (
 )
 
 func FirebaseAuthMiddleware(c *gin.Context) {
-	idToken := c.GetHeader("Authorization")
-	idToken = strings.Split(idToken, " ")[1]
+	var idToken string
+	splittedToken := strings.Split(c.GetHeader("Authorization"), " ")
+	if len(splittedToken) < 2 {
+		idToken = c.Query("token")
+	}
 
 	token, err := AuthClient.VerifyIDToken(context.Background(), idToken)
 	if err != nil {
