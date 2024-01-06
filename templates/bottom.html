@@ -18,43 +18,6 @@
     </div>
 </footer>
 
-
-<!-- Insert this script at the bottom of the HTML, but before you use any Firebase services -->
-<script type="module">
-    var firebaseConfig = {
-        apiKey: "{{ .creds.APIKey }}",
-        authDomain: "{{ .creds.AuthDomain }}",
-        projectId: "{{ .creds.ProjectID }}",
-        storageBucket: "{{ .creds.StorageBucket }}",
-        messagingSenderId: "{{ .creds.MessagingSenderID }}",
-        appId: "{{ .creds.AppID }}",
-        measurementId: "{{ .creds.MeasurementID }}"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    firebase.analytics();
-
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            if (typeof initPost !== "undefined") {
-                initPost(firestore, user.uid);
-            }
-
-            firebase.auth().currentUser
-                .getIdToken()
-                .then(function (token) {
-                    // loop through apply buttons and apply token
-                    $(".apply-button").each(function (b) {
-                        $(this).attr("href", $(this).attr("href") + "?token=" + token)
-                    });
-                })
-
-            $("#a-projects-link").attr("href", `/users/${user.uid}/projects`);
-        }
-    });
-</script>
-
 </body>
 
 </html>

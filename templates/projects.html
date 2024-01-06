@@ -48,6 +48,9 @@
                             <button type="submit" class="bg-blue hover:bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                                 Update Project
                             </button>
+                            <button onclick="if (confirm('Are you sure?')) { window.location.href='/projects/{{ .Project.ProjectID}}/delete'; }" class="bg-danger text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                                Delete forever
+                            </button>
                         </div>
                     </form>
 
@@ -61,7 +64,11 @@
 
                     {{ $id := .Project.ProjectID }}
                     {{ range .Project.Applicants}}
-                    <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/approve/{{ .ID }}/{{ .DisplayName}}">Approve</a></div>
+                        <div class="m-4">{{ .DisplayName }} |
+                            <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/approve/{{ .ID }}/{{ .DisplayName}}">Approve</a> |
+                            <a class="bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/deny/{{ .ID }}">Deny</a>
+
+                        </div>
                     {{end}}
 
                     <hr>
@@ -73,8 +80,11 @@
                     {{end}}
 
                     {{ $id := .Project.ProjectID }}
+                    {{ $userID := .UserID}}
                     {{ range .Project.Members}}
-                    <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/remove/{{ .ID }}">Remove</a></div>
+                        {{ if not eq .ID $userID}}
+                        <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/remove/{{ .ID }}">Remove</a></div>
+                        {{end}}
                     {{end}}
                 </div>
             </div>

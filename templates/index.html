@@ -22,33 +22,70 @@
                             </div>
                             <p class="mb-3 font-normal text-gray-700">{{.Short}}</p>
                             {{ $id := .ProjectID }}
+                            {{ $userID := .UserID}}
+                            {{ $p := .}}
                             {{ range .LookingFor}}
                                 {{if eq . "Backend"}}
-                                    <a
-                                            href="/projects/{{$id}}/apply/backend"
-                                            data-which="backend"
-                                            class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-bubble-gum rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                                        Apply as Backend
-                                    </a>
+                                    {{ $isBE := false }}
+                                    {{ range $a := $p.Applicants}}
+                                        {{ if eq .ID $userID }}
+                                            {{ if eq .Which "backend" }}
+                                                {{ $isBE = true }}
+                                            {{end}}
+                                        {{end}}
+                                    {{end}}
+
+                                    {{ if not $isBE }}
+                                        <a
+                                                href="/projects/{{$id}}/apply/backend"
+                                                data-which="backend"
+                                                class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-bubble-gum rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                            Apply as Backend
+                                        </a>
+                                    {{end}}
                                 {{end}}
 
+
                                 {{if eq . "Frontend"}}
-                                    <a
-                                            href="/projects/{{$id}}/apply/frontend"
-                                            data-which="frontend"
-                                            class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-tahiti rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                                        Apply as Frontend
-                                    </a>
+                                    {{ $isFE := false }}
+                                    {{ range $a := $p.Applicants}}
+                                        {{ if eq .ID $userID }}
+                                            {{ if eq .Which "frontend" }}
+                                                {{ $isFE = true }}
+                                            {{end}}
+                                        {{end}}
+                                    {{end}}
+
+                                        {{ if not $isFE }}
+                                            <a
+                                                    href="/projects/{{$id}}/apply/frontend"
+                                                    data-which="frontend"
+                                                    class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-tahiti rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                                Apply as Frontend
+                                            </a>
+                                    {{end}}
                                 {{end}}
 
                                 {{if eq . "Infra"}}
-                                    <a
-                                            href="/projects/{{$id}}/apply/infra"
-                                            data-which="infra"
-                                            class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-purple rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                                        Apply as Infrastructure
-                                    </a>
+                                    {{ $isI := false }}
+                                    {{ range $a := $p.Applicants}}
+                                        {{ if eq .ID $userID }}
+                                            {{ if eq .Which "infra" }}
+                                                {{ $isI = true }}
+                                            {{end}}
+                                        {{end}}
+                                    {{end}}
+
+                                    {{ if not $isI }}
+                                        <a
+                                                href="/projects/{{$id}}/apply/infra"
+                                                data-which="infra"
+                                                class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-purple rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                            Apply as Infrastructure
+                                        </a>
+                                    {{end}}
                                 {{end}}
+
                             {{end}}
 
                             <p class="mb-3 font-normal mt-4"><a href="/user/{{.UserID}}">by {{.DisplayName}}</a></p>

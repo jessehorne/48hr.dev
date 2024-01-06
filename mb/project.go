@@ -137,6 +137,32 @@ func UpdateProject(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
 }
 
+func DeleteProject(c *gin.Context) {
+
+	userID, err := c.Cookie("user_id")
+	if err != nil {
+		fmt.Println("couldn't find user")
+		return
+	}
+
+	id := c.Param("id")
+	
+	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
+	if err != nil {
+		return
+	}
+
+	for _, p := range posts {
+		var newP *Project
+		p.DataTo(&newP)
+		
+		StoreClient.Collection("posts").Doc(p.Ref.ID).Delete(context.Background())
+		break
+	}
+
+	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+}
+
 func GetApprove(c *gin.Context) {
 	userID, err := c.Cookie("user_id")
 	if err != nil {
@@ -176,6 +202,48 @@ func GetApprove(c *gin.Context) {
 			_, err := po.Update(context.Background(), []firestore.Update{
 				{Path: "Members", Value: newP.Members},
 			})
+			_, err = po.Update(context.Background(), []firestore.Update{
+				{Path: "Applicants", Value: newP.Applicants},
+			})
+			if err != nil {
+				// TODO
+			}
+		}
+	}
+
+	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+}
+
+func GetDeny(c *gin.Context) {
+	userID, err := c.Cookie("user_id")
+	if err != nil {
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return
+	}
+
+	u := GetUserByID(userID)
+
+	id := c.Param("id")
+	applicantID := c.Param("applicantID")
+
+	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
+	if err != nil {
+		return
+	}
+
+	for _, p := range posts {
+		var newP *Project
+		p.DataTo(&newP)
+
+		for i, v := range newP.Applicants {
+			if v.ID == applicantID {
+				newP.Applicants = append(newP.Applicants[:i], newP.Applicants[i+1:]...)
+				break
+			}
+		}
+
+		if newP.UserID == u.ID {
+			po := StoreClient.Collection("posts").Doc(p.Ref.ID)
 			_, err = po.Update(context.Background(), []firestore.Update{
 				{Path: "Applicants", Value: newP.Applicants},
 			})

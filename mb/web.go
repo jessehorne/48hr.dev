@@ -11,11 +11,12 @@ import (
 func GetIndex(c *gin.Context) {
 	// get projects
 	ps, err := StoreClient.Collection("posts").Documents(context.Background()).GetAll()
-
+	
 	var allProjects []*Project
 	for _, p := range ps {
 		var newP *Project
 		err := p.DataTo(&newP)
+		
 		if err != nil {
 			// TODO
 		}
@@ -69,7 +70,6 @@ func GetUserProjects(c *gin.Context) {
 
 	// get projects
 	ps, err := StoreClient.Collection("posts").
-		Where("UserID", "==", id).
 		Documents(context.Background()).
 		GetAll()
 
@@ -81,24 +81,28 @@ func GetUserProjects(c *gin.Context) {
 			// TODO
 		}
 		
-		var needsBackend, needsFrontend, needsInfra bool
-		for _, lf := range newP.LookingFor {
-			if lf == "Backend" {
-				needsBackend = true
-			} else if lf == "Frontend" {
-				needsFrontend = true
-			} else if lf == "Infra" {
-				needsInfra = true
-			}
-		}
+		for _, ms := range newP.Members {
+			if ms.ID == id {
+				var needsBackend, needsFrontend, needsInfra bool
+				for _, lf := range newP.LookingFor {
+					if lf == "Backend" {
+						needsBackend = true
+					} else if lf == "Frontend" {
+						needsFrontend = true
+					} else if lf == "Infra" {
+						needsInfra = true
+					}
+				}
 
-		if newP.Title != "Centrifuge" {
-			allProjects = append(allProjects, &UserProject{
-				Project: newP,
-				NeedsBackend: needsBackend,
-				NeedsFrontend: needsFrontend,
-				NeedsInfra: needsInfra,
-			})
+				if newP.Title != "Centrifuge" {
+					allProjects = append(allProjects, &UserProject{
+						Project: newP,
+						NeedsBackend: needsBackend,
+						NeedsFrontend: needsFrontend,
+						NeedsInfra: needsInfra,
+					})
+				}
+			}
 		}
 	}
 
