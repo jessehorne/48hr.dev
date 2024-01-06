@@ -156,3 +156,4 @@ go.work
 key.json
 public/css/*
 .env
+ssl/

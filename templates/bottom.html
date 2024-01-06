@@ -51,21 +51,8 @@
                 })
 
             $("#a-projects-link").attr("href", `/users/${user.uid}/projects`);
-            $("#login-link").addClass("hidden");
-            $("#projects-link").removeClass("hidden");
-        } else {
-            $("#login-link").removeClass("hidden");
-            $("#projects-link").addClass("hidden");
         }
     });
-
-    // Initialize the FirebaseUI Widget using Firebase.
-    var ui = new firebaseui.auth.AuthUI(firebase.auth());
-
-    var firestore;
-    if (firebase.firestore) {
-        firestore = firebase.firestore();
-    }
 </script>
 
 </body>

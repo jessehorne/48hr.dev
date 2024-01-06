@@ -2,7 +2,6 @@ package mb
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -65,27 +64,26 @@ func PostProject(c *gin.Context) {
 	var projRequest ProjectRequest
 	err := c.Bind(&projRequest)
 	if err != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusBadRequest, DataResponse(c, gin.H{
 			"msg": "invalid request",
-		})
+		}))
 		return
 	}
 	
 	// get user id from request
 	token, exists := c.Get("token")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusUnauthorized, DataResponse(c, gin.H{
 			"msg": "not authenticated",
-		})
+		}))
 		return
 	}
 	
 	t := token.(*auth.Token)
 	if t == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusUnauthorized, DataResponse(c, gin.H{
 			"msg": "invalid token",
-		})
+		}))
 		return
 	}
 	
@@ -96,5 +94,7 @@ func PostProject(c *gin.Context) {
 	// add to collection
 	StoreClient.Collection("posts").Add(context.Background(), newProj)
 	
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, DataResponse(c, gin.H{
+		"msg": "invalid token",
+	}))
 }

@@ -26,9 +26,4 @@ $(document).ready(function() {
         // Privacy policy url.
         privacyPolicyUrl: '<your-privacy-policy-url>'
     };
-
-
-    if ($("#firebaseui").length) {
-        ui.start('#firebaseui', uiConfig);
-    }
 });
