@@ -73,16 +73,32 @@ func GetUserProjects(c *gin.Context) {
 		Documents(context.Background()).
 		GetAll()
 
-	var allProjects []*Project
+	var allProjects []*UserProject
 	for _, p := range ps {
 		var newP *Project
 		err := p.DataTo(&newP)
 		if err != nil {
 			// TODO
 		}
+		
+		var needsBackend, needsFrontend, needsInfra bool
+		for _, lf := range newP.LookingFor {
+			if lf == "Backend" {
+				needsBackend = true
+			} else if lf == "Frontend" {
+				needsFrontend = true
+			} else if lf == "Infra" {
+				needsInfra = true
+			}
+		}
 
 		if newP.Title != "Centrifuge" {
-			allProjects = append(allProjects, newP)
+			allProjects = append(allProjects, &UserProject{
+				Project: newP,
+				NeedsBackend: needsBackend,
+				NeedsFrontend: needsFrontend,
+				NeedsInfra: needsInfra,
+			})
 		}
 	}
 

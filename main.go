@@ -26,16 +26,14 @@ func main() {
 	
 	// service ./public/* to the "/" route
 	r.NoRoute(gin.WrapH(http.FileServer(gin.Dir("public", false))))
-
-	// Auth'd API routes
-	var api *gin.RouterGroup
-
-	api = r.Group("/api")
 	
-	//api.Use(mb.FirebaseAuthMiddleware)
-	api.Use(mb.DiscordAuthMiddleware)
-	api.POST("/projects", mb.PostProject)
-	api.GET("/projects/:id/apply/:which", mb.GetApply)
+	r.POST("/projects", mb.DiscordAuthMiddleware, mb.PostProject)
+	r.POST("/projects/:id", mb.DiscordAuthMiddleware, mb.UpdateProject)
+	r.GET("/projects/:id/apply/:which", mb.DiscordAuthMiddleware, mb.GetApply)
+	r.GET("/projects/:id/approve/:applicantID/:applicantUsername", mb.DiscordAuthMiddleware, mb.GetApprove)
+	r.GET("/projects/:id/remove/:memberID", mb.DiscordAuthMiddleware, mb.GetRemove)
+	//r.GET("/projects/:id/deny/:applicantID", mb.DiscordAuthMiddleware, mb.GetDeny)
+	//r.GET("/projects/:id/disable/:which", mb.DiscordAuthMiddleware, mb.GetDisable)
 	
 	r.GET("/profile", mb.DiscordAuthMiddleware, mb.GetProfile)
 	r.POST("/profile", mb.DiscordAuthMiddleware, mb.PostProfile)

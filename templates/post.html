@@ -2,38 +2,38 @@
 {{template "nav" .}}
 
 <div class="w-full max-w-xs mx-auto">
-    <form id="post-form" class="bg-white px-8 pt-6 pb-8 mb-4">
+    <form method="POST" action="/projects" class="bg-white px-8 pt-6 pb-8 mb-4">
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="title">
                 Title
             </label>
-            <input id="title-input" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="title" type="text" placeholder="">
+            <input name="Title" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="title" type="text" placeholder="">
         </div>
         <div class="mb-6">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="short">
                 Short
             </label>
-            <textarea id="short-input" name="short" id="short" cols="30" rows="10" class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+            <textarea id="short-input" name="Short" id="short" cols="30" rows="10" class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"></textarea>
         </div>
         <div class="mb-6">
             <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="backend-input" class="sr-only peer">
+                <input type="checkbox" name="LookingFor[]" value="Backend" class="sr-only peer">
                 <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue"></div>
                 <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Looking for Backend</span>
             </label>
             <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="frontend-input" class="sr-only peer">
+                <input type="checkbox" name="LookingFor[]" value="Frontend" class="sr-only peer">
                 <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue"></div>
                 <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Looking for Frontend</span>
             </label>
             <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="infra-input" class="sr-only peer">
+                <input type="checkbox" name="LookingFor[]" value="Infra" class="sr-only peer">
                 <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue"></div>
                 <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Looking for Infrastructure</span>
             </label>
         </div>
         <div class="flex items-center justify-between">
-            <button id="create-button" class="bg-blue hover:bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+            <button type="submit" class="bg-blue hover:bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Create Project
             </button>
         </div>

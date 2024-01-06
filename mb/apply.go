@@ -5,41 +5,24 @@ import (
 	"net/http"
 
 	"cloud.google.com/go/firestore"
-	"firebase.google.com/go/v4/auth"
 	"github.com/gin-gonic/gin"
 )
 
 func GetApply(c *gin.Context) {
-	// get user id from request
-	token, exists := c.Get("token")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"msg": "not authenticated",
-		})
-		return
-	}
-
-	t := token.(*auth.Token)
-	if t == nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"msg": "invalid token",
-		})
-		return
-	}
-
-	userID := t.UID
-
-	u, err := AuthClient.GetUser(context.Background(), userID)
+	userID, err := c.Cookie("user_id")
 	if err != nil {
+		c.Redirect(http.StatusTemporaryRedirect, "/")
 		return
 	}
+	
+	u := GetUserByID(userID)
 
 	which := c.Param("which")
 	id := c.Param("id")
 
 	newApplicant := Applicant{
 		ID:          userID,
-		DisplayName: u.DisplayName,
+		DisplayName: u.DiscordUser.Username,
 		Which: which,
 	}
 
@@ -59,6 +42,49 @@ func GetApply(c *gin.Context) {
 		})
 		if err != nil {
 			// TODO
+		}
+	}
+
+	c.Redirect(http.StatusFound, "/")
+}
+
+func GetDisable(c *gin.Context) {
+	userID, err := c.Cookie("user_id")
+	if err != nil {
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return
+	}
+
+	u := GetUserByID(userID)
+
+	which := c.Param("which")
+	id := c.Param("id")
+
+	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
+	if err != nil {
+		return
+	}
+
+	for _, p := range posts {
+		var newP *Project
+		p.DataTo(&newP)
+
+		for i, v := range newP.LookingFor {
+			if v == which {
+				newP.LookingFor = append(newP.LookingFor[:i], newP.LookingFor[i+1:]...)
+				break
+			}
+		}
+
+
+		if newP.UserID == u.ID {
+			po := StoreClient.Collection("posts").Doc(p.Ref.ID)
+			_, err := po.Update(context.Background(), []firestore.Update{
+				{Path: "LookingFor", Value: newP.LookingFor},
+			})
+			if err != nil {
+				// TODO
+			}
 		}
 	}
 

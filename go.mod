@@ -5,11 +5,13 @@ go 1.21.4
 require (
 	cloud.google.com/go/firestore v1.9.0
 	firebase.google.com/go/v4 v4.13.0
+	github.com/fatih/structs v1.1.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-playground/validator/v10 v10.14.0
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/ravener/discord-oauth2 v0.0.0-20230514095040-ae65713199b3
+	golang.org/x/oauth2 v0.7.0
 	google.golang.org/api v0.114.0
 )
 
@@ -47,7 +49,6 @@ require (
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect

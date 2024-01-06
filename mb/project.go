@@ -2,10 +2,11 @@ package mb
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
-	"firebase.google.com/go/v4/auth"
+	"cloud.google.com/go/firestore"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -17,11 +18,16 @@ type Project struct {
 	CreatedAt time.Time `json:"createdAt"`
 	Title string `json:"title"`
 	Short string `json:"short"`
-	NeedsBackend bool `json:"needsBackend"`
-	NeedsFrontend bool `json:"needsFrontend"`
-	NeedsInfra bool `json:"needsInfra"`
+	LookingFor []string `form:"LookingFor[]"`
 	Applicants []Applicant `json:"applicants"`
-	Members []string `json:"members"`
+	Members []Member `json:"members"`
+}
+
+type UserProject struct {
+	Project *Project
+	NeedsBackend bool
+	NeedsFrontend bool
+	NeedsInfra bool
 }
 
 type Applicant struct {
@@ -30,33 +36,39 @@ type Applicant struct {
 	Which string `json:"which"` // frontend, backend or infra
 }
 
+type Member struct {
+	ID string `json:"id"`
+	DisplayName string `json:"displayName"`
+}
+
 type ProjectRequest struct {
 	Title string `json:"title"`
 	Short string `json:"short"`
-	NeedsBackend bool `json:"needsBackend"`
-	NeedsFrontend bool `json:"needsFrontend"`
-	NeedsInfra bool `json:"needsInfra"`
+	LookingFor []string `form:"LookingFor[]"`
 }
 
 func NewProject(userID string, pr *ProjectRequest) *Project {
-	u, err := AuthClient.GetUser(context.Background(), userID)
-	if err != nil {
+	u := GetUserByID(userID)
+	
+	if u == nil {
 		return nil
 	}
-	
 	
 	return &Project{
 		ProjectID: uuid.New().String(),
 		UserID: userID,
-		DisplayName: u.DisplayName,
+		DisplayName: u.DiscordUser.Username,
 		CreatedAt: time.Now(),
 		Title: pr.Title,
 		Short: pr.Short,
-		NeedsBackend: pr.NeedsBackend,
-		NeedsFrontend: pr.NeedsFrontend,
-		NeedsInfra: pr.NeedsInfra,
+		LookingFor: pr.LookingFor,
 		Applicants: []Applicant{},
-		Members: []string{userID},
+		Members: []Member{
+			{
+				ID: u.ID,
+				DisplayName: u.DiscordUser.Username,
+			},
+		},
 	}
 }
 
@@ -64,37 +76,156 @@ func PostProject(c *gin.Context) {
 	var projRequest ProjectRequest
 	err := c.Bind(&projRequest)
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, DataResponse(c, gin.H{
 			"msg": "invalid request",
 		}))
 		return
 	}
 	
-	// get user id from request
-	token, exists := c.Get("token")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, DataResponse(c, gin.H{
-			"msg": "not authenticated",
-		}))
+	userID, err := c.Cookie("user_id")
+	if err != nil {
+		fmt.Println("couldn't find user")
 		return
 	}
-	
-	t := token.(*auth.Token)
-	if t == nil {
-		c.JSON(http.StatusUnauthorized, DataResponse(c, gin.H{
-			"msg": "invalid token",
-		}))
-		return
-	}
-	
-	userID := t.UID
 	
 	newProj := NewProject(userID, &projRequest)
 	
 	// add to collection
-	StoreClient.Collection("posts").Add(context.Background(), newProj)
+	_, _, err = StoreClient.Collection("posts").Add(context.Background(), newProj)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	
-	c.JSON(http.StatusOK, DataResponse(c, gin.H{
-		"msg": "invalid token",
-	}))
+	c.Redirect(http.StatusFound, "/")
+}
+
+func UpdateProject(c *gin.Context) {
+	var projRequest ProjectRequest
+	err := c.Bind(&projRequest)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, DataResponse(c, gin.H{
+			"msg": "invalid request",
+		}))
+		return
+	}
+
+	userID, err := c.Cookie("user_id")
+	if err != nil {
+		fmt.Println("couldn't find user")
+		return
+	}
+
+	id := c.Param("id")
+	
+	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
+	if err != nil {
+		return
+	}
+
+	for _, p := range posts {
+		po := StoreClient.Collection("posts").Doc(p.Ref.ID)
+		po.Update(context.Background(), []firestore.Update{
+			{Path: "Title", Value: projRequest.Title},
+			{Path: "Short", Value: projRequest.Short},
+			{Path: "LookingFor", Value: projRequest.LookingFor},
+		})
+	}
+
+	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+}
+
+func GetApprove(c *gin.Context) {
+	userID, err := c.Cookie("user_id")
+	if err != nil {
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return
+	}
+
+	u := GetUserByID(userID)
+
+	id := c.Param("id")
+	applicantID := c.Param("applicantID")
+	applicantUsername := c.Param("applicantUsername")
+
+	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
+	if err != nil {
+		return
+	}
+
+	for _, p := range posts {
+		var newP *Project
+		p.DataTo(&newP)
+
+		newP.Members = append(newP.Members, Member{
+			ID: applicantID,
+			DisplayName: applicantUsername,
+		})
+
+		for i, v := range newP.Applicants {
+			if v.ID == applicantID {
+				newP.Applicants = append(newP.Applicants[:i], newP.Applicants[i+1:]...)
+				break
+			}
+		}
+		
+		if newP.UserID == u.ID {
+			po := StoreClient.Collection("posts").Doc(p.Ref.ID)
+			_, err := po.Update(context.Background(), []firestore.Update{
+				{Path: "Members", Value: newP.Members},
+			})
+			_, err = po.Update(context.Background(), []firestore.Update{
+				{Path: "Applicants", Value: newP.Applicants},
+			})
+			if err != nil {
+				// TODO
+			}
+		}
+	}
+
+	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+}
+
+func GetRemove(c *gin.Context) {
+	userID, err := c.Cookie("user_id")
+	if err != nil {
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return
+	}
+
+	u := GetUserByID(userID)
+
+	id := c.Param("id")
+	memberID := c.Param("memberID")
+
+	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
+	if err != nil {
+		return
+	}
+
+	for _, p := range posts {
+		var newP *Project
+		p.DataTo(&newP)
+
+		for i, v := range newP.Members {
+			if v.ID == memberID {
+				newP.Members = append(newP.Members[:i], newP.Members[i+1:]...)
+				break
+			}
+		}
+
+		if newP.UserID == u.ID {
+			po := StoreClient.Collection("posts").Doc(p.Ref.ID)
+			_, err := po.Update(context.Background(), []firestore.Update{
+				{Path: "Members", Value: newP.Members},
+			})
+			if err != nil {
+				// TODO
+			}
+		}
+	}
+
+	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
 }
