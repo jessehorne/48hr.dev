@@ -61,7 +61,7 @@
 
                     {{ $id := .Project.ProjectID }}
                     {{ range .Project.Applicants}}
-                    <div class="m-4">{{ .Project.DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/approve/{{ .ID }}/{{ .DisplayName}}">Approve</a></div>
+                    <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/approve/{{ .ID }}/{{ .DisplayName}}">Approve</a></div>
                     {{end}}
 
                     <hr>
@@ -74,7 +74,7 @@
 
                     {{ $id := .Project.ProjectID }}
                     {{ range .Project.Members}}
-                    <div class="m-4">{{ .Project.DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/remove/{{ .ID }}">Remove</a></div>
+                    <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/remove/{{ .ID }}">Remove</a></div>
                     {{end}}
                 </div>
             </div>
