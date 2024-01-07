@@ -13,9 +13,14 @@
                 <div class="p-4">
                     <div class="flex flex-row">
                         {{ if .Project.Started}}
-                        <div class="w-full text-left">started <b class="font-bold">{{.EnglishStartTime}}</b></div>
+                        <div class="font-normal m-4">Deadline <b class="timer font-bold" data-started="{{ .Project.StartedAt}}"></b></div>
                         {{end}}
-                        <div class="w-full text-right">created <b class="font-bold">{{.EnglishCreatedTime}}</b></div>
+                    </div>
+                    <div class="flex flex-row">
+                        {{ if .Project.Started}}
+                        <div class="w-full text-left m-4">started <b class="font-bold">{{.EnglishStartTime}}</b></div>
+                        {{end}}
+                        <div class="w-full text-right m-4">created <b class="font-bold">{{.EnglishCreatedTime}}</b></div>
                     </div>
                     <form method="POST" action="/projects/{{ .Project.ProjectID }}" class="px-8 pt-6 pb-8 mb-4">
                         <div class="mb-4">
@@ -52,9 +57,9 @@
                                 Update Project
                             </button>
                             {{if not .Project.Started}}
-                                <button onclick="if (confirm('Are you sure?')) { window.location.href='/projects/{{ .Project.ProjectID}}/start'; }" class="bg-purple hover:bg-purple text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                                    Start Project
-                                </button>
+                            <button onclick="if (confirm('Are you sure?')) { window.location.href='/projects/{{ .Project.ProjectID}}/start'; }" class="bg-purple hover:bg-purple text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                                Start Project
+                            </button>
                             {{end}}
                             <button onclick="if (confirm('Are you sure?')) { window.location.href='/projects/{{ .Project.ProjectID}}/delete'; }" class="bg-danger text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                                 Delete forever
@@ -72,12 +77,12 @@
 
                     {{ $id := .Project.ProjectID }}
                     {{ range .Project.Applicants}}
-                        <div class="m-4">{{ .DisplayName }}
-                            (<b class="bg-silver">{{ .Which}}</b>)
-                            <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/approve/{{ .ID }}/{{ .DisplayName}}">Approve</a> |
-                            <a class="bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/deny/{{ .ID }}">Deny</a>
+                    <div class="m-4">{{ .DisplayName }}
+                        (<b class="bg-silver">{{ .Which}}</b>)
+                        <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/approve/{{ .ID }}/{{ .DisplayName}}">Approve</a> |
+                        <a class="bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/deny/{{ .ID }}">Deny</a>
 
-                        </div>
+                    </div>
                     {{end}}
 
                     <hr>
@@ -90,9 +95,9 @@
 
                     {{ $id := .Project.ProjectID }}
                     {{ range .Project.Members}}
-                        {{ if not (eq .ID $userID)}}
-                        <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/remove/{{ .ID }}">Remove</a></div>
-                        {{end}}
+                    {{ if not (eq .ID $userID)}}
+                    <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/remove/{{ .ID }}">Remove</a></div>
+                    {{end}}
                     {{end}}
                     <div class="m-4">You</div>
                 </div>

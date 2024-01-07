@@ -18,6 +18,36 @@
     </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/relativeTime.min.js"></script>
+<script>
+    // dayjs.extend(window.dayjs_plugin_advancedFormat);
+    // dayjs.extend(window.dayjs_plugin_timezone);
+    dayjs.extend(window.dayjs_plugin_relativeTime)
+    if ($(".timer").length) {
+        function countdownTimeStart(e, started){
+            started = started.split(" +")[0];
+            var countDownDate = dayjs(started, "YYYY-MM-DD hh:mm:ss").add(2, "d");
+            // var countDownDate = dayjs();
+
+            console.log(countDownDate)
+            var x = setInterval(function() {
+                var temp = dayjs().to(countDownDate);
+
+                if (temp == "a few seconds ago") {
+                    e.html("Passed");
+                } else {
+                    e.html(dayjs().to(countDownDate));
+                }
+            }, 1000);
+        }
+
+        $(".timer").each(function(t) {
+            countdownTimeStart($(this), $(this).data("started"))
+        })
+    }
+</script>
+
 </body>
 
 </html>

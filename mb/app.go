@@ -3,6 +3,7 @@ package mb
 import (
 	"context"
 	"os"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
@@ -23,6 +24,8 @@ var State string
 var OAuthConf *oauth2.Config
 
 func InitApp(debug bool) {
+	time.Local = time.UTC
+	
 	DebugMode = debug
 	
 	Context = context.Background()
