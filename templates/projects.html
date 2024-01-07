@@ -3,21 +3,21 @@
 
 <!-- Projects -->
 <div class="container mx-auto px-4 flex justify-center items-center">
-    <div class="max-w-screen-xl rounded-lg overflow-hidden bg-white mx-auto">
+    <div class="max-w-screen-xl rounded-lg overflow-hidden mx-auto">
 
         <div id="cards" class="container mx-auto flex flex-wrap gap-4">
             {{ $userID := .UserID}}
             {{ if .projects}}
             {{range .projects}}
-            <div class="max-w-screen-xl rounded-lg border border-gray-200 overflow-hidden shadow-md bg-white p-4">
+            <div class="max-w-screen-xl rounded-lg border border-gray-200 overflow-hidden shadow-md p-4">
                 <div class="p-4">
                     <div class="flex flex-row">
                         {{ if .Project.Started}}
-                        <div class="w-full text-left">started on <b class="font-bold">{{.EnglishStartTime}}</b></div>
+                        <div class="w-full text-left">started <b class="font-bold">{{.EnglishStartTime}}</b></div>
                         {{end}}
-                        <div class="w-full text-right"><b class="font-bold">{{.EnglishCreatedTime}}</b></div>
+                        <div class="w-full text-right">created <b class="font-bold">{{.EnglishCreatedTime}}</b></div>
                     </div>
-                    <form method="POST" action="/projects/{{ .Project.ProjectID }}" class="bg-white px-8 pt-6 pb-8 mb-4">
+                    <form method="POST" action="/projects/{{ .Project.ProjectID }}" class="px-8 pt-6 pb-8 mb-4">
                         <div class="mb-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="title">
                                 Title
@@ -33,17 +33,17 @@
                         <div class="mb-6">
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input {{ if .NeedsBackend }} checked {{end}} type="checkbox" name="LookingFor[]" value="Backend" class="sr-only peer">
-                                <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue"></div>
+                                <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:border-midnight after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:bubble-gum peer-checked:bg-blue"></div>
                                 <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Looking for Backend</span>
                             </label>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input {{ if .NeedsFrontend }} checked {{end}} type="checkbox" name="LookingFor[]" value="Frontend" class="sr-only peer">
-                                <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue"></div>
+                                <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:border-midnight after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:bubble-gum peer-checked:bg-blue"></div>
                                 <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Looking for Frontend</span>
                             </label>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input {{ if .NeedsInfra }} checked {{end}} type="checkbox" name="LookingFor[]" value="Infra" class="sr-only peer">
-                                <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue"></div>
+                                <div class="w-11 h-6 bg-silver peer-focus:outline-none peer-focus:ring-4 peer-focus:blue dark:peer-focus:blue rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:border-midnight after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:bubble-gum peer-checked:bg-blue"></div>
                                 <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Looking for Infrastructure</span>
                             </label>
                         </div>
@@ -64,10 +64,10 @@
 
                     <hr>
 
-                    <div class="font-bold">Applicants</div>
+                    <div class="font-bold m-4">Applicants</div>
 
                     {{ if eq (len .Project.Applicants) 0}}
-                    <p>Your project has no applicants.</p>
+                    <p class="m-4">Your project has no applicants.</p>
                     {{end}}
 
                     {{ $id := .Project.ProjectID }}
@@ -82,7 +82,7 @@
 
                     <hr>
 
-                    <div class="font-bold">Members</div>
+                    <div class="font-bold m-4">Members</div>
 
                     {{ if eq (len .Project.Members) 0}}
                     <p>Your project has no applicants.</p>
@@ -94,6 +94,7 @@
                         <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/remove/{{ .ID }}">Remove</a></div>
                         {{end}}
                     {{end}}
+                    <div class="m-4">You</div>
                 </div>
             </div>
             {{end}}

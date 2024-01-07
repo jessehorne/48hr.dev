@@ -5,4 +5,19 @@
 html, body {
     margin: 0;
     padding: 0;
+    background-color: #040D12;
+}
+
+*{
+    color: white;
+}
+
+input {
+    background-color: #93B1A6;
+    color: black;
+}
+
+textarea {
+    background-color: #93B1A6;
+    color: black;
 }
