@@ -13,9 +13,9 @@
                 <div class="p-4">
                     <div class="flex flex-row">
                         {{ if .Project.Started}}
-                        <div class="w-full text-left">started on <b class="font-bold">{{.Project.StartedAt.Format "02 Jan 06 15:04 UTC"}}</b></div>
+                        <div class="w-full text-left">started on <b class="font-bold">{{.EnglishStartTime}}</b></div>
                         {{end}}
-                        <div class="w-full text-right">created on <b class="font-bold">{{.Project.CreatedAt.Format "02 Jan 06 15:04 UTC"}}</b></div>
+                        <div class="w-full text-right"><b class="font-bold">{{.EnglishCreatedTime}}</b></div>
                     </div>
                     <form method="POST" action="/projects/{{ .Project.ProjectID }}" class="bg-white px-8 pt-6 pb-8 mb-4">
                         <div class="mb-4">

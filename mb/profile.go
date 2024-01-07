@@ -1,9 +1,11 @@
 package mb
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xeonx/timeago"
 )
 
 func GetProfile(c *gin.Context) {
@@ -38,4 +40,58 @@ func PostProfile(c *gin.Context) {
 	
 	c.Redirect(301, "/profile")
 	return
+}
+
+func GetUserProfile(c *gin.Context) {
+	id := c.Param("id")
+
+	if id == "" {
+		return
+	}
+
+	// get user from db
+	us, err := StoreClient.Collection("users").Where("ID", "==", id).Documents(context.Background()).GetAll()
+
+	var user *User
+	for _, u := range us {
+		err := u.DataTo(&user)
+		if err != nil {
+			// TODO
+		}
+		break
+	}
+
+	// get projects
+	ps, err := StoreClient.Collection("posts").
+		Documents(context.Background()).
+		GetAll()
+	if err != nil {
+		// TODO
+	}
+
+	var allProjects []*Project
+	for _, p := range ps {
+		var newP *Project
+		err := p.DataTo(&newP)
+		if err != nil {
+			// TODO
+		}
+		newP.EnglishCreatedTime = timeago.English.Format(newP.CreatedAt)
+		newP.EnglishStartedTime = timeago.English.Format(newP.StartedAt)
+		allProjects = append(allProjects, newP)
+	}
+
+	if err != nil {
+		c.HTML(http.StatusOK, "user.html", DataResponse(c, gin.H{
+			"creds": GetFirebaseClientCredentials(),
+		}))
+		return
+	} else {
+		c.HTML(http.StatusOK, "user.html", DataResponse(c, gin.H{
+			"creds": GetFirebaseClientCredentials(),
+			"projects": allProjects,
+			"user": user,
+		}))
+		return
+	}
 }

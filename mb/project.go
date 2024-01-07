@@ -24,6 +24,8 @@ type Project struct {
 	Members []Member `json:"members"`
 	Started bool
 	StartedAt time.Time
+	EnglishCreatedTime string
+	EnglishStartedTime string
 }
 
 type UserProject struct {
@@ -31,6 +33,8 @@ type UserProject struct {
 	NeedsBackend bool
 	NeedsFrontend bool
 	NeedsInfra bool
+	EnglishStartTime string
+	EnglishCreatedTime string
 }
 
 type Applicant struct {

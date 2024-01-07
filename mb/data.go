@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xeonx/timeago"
 )
 
 func DataResponse(c *gin.Context, data gin.H) gin.H {
@@ -25,6 +26,7 @@ func DataResponse(c *gin.Context, data gin.H) gin.H {
 			data["UserDisplayName"] = u.DiscordUser.Username
 			data["UserDescription"] = u.Description
 			data["UserCreatedAt"] = u.CreatedAt
+			data["EnglishCreatedAt"] = timeago.English.Format(u.CreatedAt)
 		} else {
 			fmt.Println("couldn't get user by id")
 		}
