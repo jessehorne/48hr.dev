@@ -16,6 +16,7 @@ type Project struct {
 	UserID string `json:"userID"`
 	DisplayName string `json:"displayName"`
 	CreatedAt time.Time `json:"createdAt"`
+	EnglishTime string
 	Title string `json:"title"`
 	Short string `json:"short"`
 	LookingFor []string `form:"LookingFor[]"`

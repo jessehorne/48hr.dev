@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xeonx/timeago"
 )
 
 func GetIndex(c *gin.Context) {
@@ -16,6 +17,7 @@ func GetIndex(c *gin.Context) {
 	for _, p := range ps {
 		var newP *Project
 		err := p.DataTo(&newP)
+		newP.EnglishTime = timeago.English.Format(newP.CreatedAt)
 		
 		if err != nil {
 			// TODO
