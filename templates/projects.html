@@ -1,5 +1,4 @@
 {{ template "top".}}
-
 {{ template "nav".}}
 
 <!-- Projects -->
@@ -7,12 +6,16 @@
     <div class="max-w-screen-xl rounded-lg overflow-hidden bg-white mx-auto">
 
         <div id="cards" class="container mx-auto flex flex-wrap gap-4">
+            {{ $userID := .UserID}}
             {{ if .projects}}
             {{range .projects}}
             <div class="max-w-screen-xl rounded-lg border border-gray-200 overflow-hidden shadow-md bg-white p-4">
                 <div class="p-4">
                     <div class="flex flex-row">
-                        <p class="w-full text-right">created on <b class="font-bold">{{.Project.CreatedAt.Format "02 Jan 06 15:04 EST"}}</b></p>
+                        {{ if .Project.Started}}
+                        <div class="w-full text-left">started on <b class="font-bold">{{.Project.StartedAt.Format "02 Jan 06 15:04 UTC"}}</b></div>
+                        {{end}}
+                        <div class="w-full text-right">created on <b class="font-bold">{{.Project.CreatedAt.Format "02 Jan 06 15:04 UTC"}}</b></div>
                     </div>
                     <form method="POST" action="/projects/{{ .Project.ProjectID }}" class="bg-white px-8 pt-6 pb-8 mb-4">
                         <div class="mb-4">
@@ -23,7 +26,7 @@
                         </div>
                         <div class="mb-6">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="short">
-                                Short
+                                Description
                             </label>
                             <textarea id="short-input" name="Short" id="short" cols="30" rows="10" class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">{{.Project.Short}}</textarea>
                         </div>
@@ -48,6 +51,11 @@
                             <button type="submit" class="bg-blue hover:bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                                 Update Project
                             </button>
+                            {{if not .Project.Started}}
+                                <button onclick="if (confirm('Are you sure?')) { window.location.href='/projects/{{ .Project.ProjectID}}/start'; }" class="bg-purple hover:bg-purple text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                                    Start Project
+                                </button>
+                            {{end}}
                             <button onclick="if (confirm('Are you sure?')) { window.location.href='/projects/{{ .Project.ProjectID}}/delete'; }" class="bg-danger text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                                 Delete forever
                             </button>
@@ -64,7 +72,8 @@
 
                     {{ $id := .Project.ProjectID }}
                     {{ range .Project.Applicants}}
-                        <div class="m-4">{{ .DisplayName }} |
+                        <div class="m-4">{{ .DisplayName }}
+                            (<b class="bg-silver">{{ .Which}}</b>)
                             <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/approve/{{ .ID }}/{{ .DisplayName}}">Approve</a> |
                             <a class="bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/deny/{{ .ID }}">Deny</a>
 
@@ -80,9 +89,8 @@
                     {{end}}
 
                     {{ $id := .Project.ProjectID }}
-                    {{ $userID := .UserID}}
                     {{ range .Project.Members}}
-                        {{ if not eq .ID $userID}}
+                        {{ if not (eq .ID $userID)}}
                         <div class="m-4">{{ .DisplayName }} | <a class="bg-bubble-gum text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" href="/projects/{{ $id}}/remove/{{ .ID }}">Remove</a></div>
                         {{end}}
                     {{end}}

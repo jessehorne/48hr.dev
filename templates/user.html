@@ -1,0 +1,119 @@
+{{ template "top" .}}
+
+{{ template "nav" .}}
+
+<div class="w-full max-w-md mx-auto">
+    <p><b class="font-bold">Created: </b>{{ .user.CreatedAt }}</p>
+    <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2">
+                Discord Name
+            </label>
+            <p class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                {{ .user.DiscordUser.Username}}
+            </p>
+        </div>
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="short">
+                Description
+            </label>
+            <textarea disabled name="desc" id="short" cols="30" rows="10" class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">{{ .user.Description}}</textarea>
+        </div>
+    </form>
+
+    <!-- Projects -->
+    <div class="container mx-auto px-4 flex justify-center items-center">
+        <div class="max-w-screen-xl rounded-lg overflow-hidden bg-white mx-auto">
+
+            <div id="cards" class="container mx-auto flex flex-wrap gap-4">
+                {{ if .projects}}
+                {{range .projects}}
+                <div class="max-w-screen-xl rounded-lg border border-gray-200 overflow-hidden shadow-md bg-white p-4">
+                    <div class="p-4">
+                        <div class="flex flex-row">
+                            <h5 class="basis-1/3 text-2xl font-bold tracking-tight text-gray-900">{{.Title}}</h5>
+                            <p class="basis-2/3 text-right">created on <b class="font-bold">{{.CreatedAt.Format "02 Jan 06 15:04 EST"}}</b></p>
+                        </div>
+                        <p class="mb-3 font-normal text-gray-700">{{.Short}}</p>
+                        {{ $id := .ProjectID }}
+                        {{ $userID := .UserID}}
+                        {{ $p := .}}
+                        {{ range .LookingFor}}
+                        {{if eq . "Backend"}}
+                        {{ $isBE := false }}
+                        {{ range $a := $p.Applicants}}
+                        {{ if eq .ID $userID }}
+                        {{ if eq .Which "backend" }}
+                        {{ $isBE = true }}
+                        {{end}}
+                        {{end}}
+                        {{end}}
+
+                        {{ if not $isBE }}
+                        <a
+                                href="/projects/{{$id}}/apply/backend"
+                                data-which="backend"
+                                class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-bubble-gum rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                            Apply as Backend
+                        </a>
+                        {{end}}
+                        {{end}}
+
+
+                        {{if eq . "Frontend"}}
+                        {{ $isFE := false }}
+                        {{ range $a := $p.Applicants}}
+                        {{ if eq .ID $userID }}
+                        {{ if eq .Which "frontend" }}
+                        {{ $isFE = true }}
+                        {{end}}
+                        {{end}}
+                        {{end}}
+
+                        {{ if not $isFE }}
+                        <a
+                                href="/projects/{{$id}}/apply/frontend"
+                                data-which="frontend"
+                                class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-tahiti rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                            Apply as Frontend
+                        </a>
+                        {{end}}
+                        {{end}}
+
+                        {{if eq . "Infra"}}
+                        {{ $isI := false }}
+                        {{ range $a := $p.Applicants}}
+                        {{ if eq .ID $userID }}
+                        {{ if eq .Which "infra" }}
+                        {{ $isI = true }}
+                        {{end}}
+                        {{end}}
+                        {{end}}
+
+                        {{ if not $isI }}
+                        <a
+                                href="/projects/{{$id}}/apply/infra"
+                                data-which="infra"
+                                class="apply-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-purple rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                            Apply as Infrastructure
+                        </a>
+                        {{end}}
+                        {{end}}
+
+                        {{end}}
+
+                        <p class="mb-3 font-normal mt-4"><a href="/users/{{.UserID}}">by {{.DisplayName}}</a></p>
+                    </div>
+                </div>
+                {{end}}
+                {{else}}
+                <p>There's nothing here yet. Consider starting your own project.</p>
+                {{end}}
+            </div>
+
+        </div>
+    </div>
+    <!-- End Projects -->
+</div>
+
+{{ template "bottom" .}}

@@ -1,8 +1,9 @@
-microblog
+Centrifuge
 ===
 
-# Features
-    * TODO
+The official website for Centrifuge written in Go and built with Tailwind.
+
+more coming soon...
 
 # Development
 
@@ -15,7 +16,6 @@ microblog
 
 ## Notes
 * `src/` contains the CSS files. Do not edit `public/css/*`
-* `public/js/*` can/should be edited. We can clean this up later.
 
 ### Generate SSL info for testing locally (https is required)
 

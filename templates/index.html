@@ -3,8 +3,8 @@
     {{template "nav" .}}
 
     <div class="max-w-screen-xl grid grid-rows-1 items-center justify-center mx-auto p-4 sm:text-center xl:text-center">
-        <h2 class="text-4xl">The rapid idea platform.</h2>
-        <div class="text-1xl mt-3">Build something in 48 hours.</div>
+        <h2 class="text-4xl">Build something.</h2>
+<!--        <div class="text-1xl mt-3">Build something.</div>-->
     </div>
 
     <!-- Projects -->
@@ -20,7 +20,7 @@
                                 <h5 class="basis-1/3 text-2xl font-bold tracking-tight text-gray-900">{{.Title}}</h5>
                                 <p class="basis-2/3 text-right">created on <b class="font-bold">{{.CreatedAt.Format "02 Jan 06 15:04 EST"}}</b></p>
                             </div>
-                            <p class="mb-3 font-normal text-gray-700">{{.Short}}</p>
+                            <p class="mb-3 font-normal text-gray-700">{{ slice .Short 0 100}}</p>
                             {{ $id := .ProjectID }}
                             {{ $userID := .UserID}}
                             {{ $p := .}}
@@ -88,7 +88,7 @@
 
                             {{end}}
 
-                            <p class="mb-3 font-normal mt-4"><a href="/user/{{.UserID}}">by {{.DisplayName}}</a></p>
+                            <p class="mb-3 font-normal mt-4"><a href="/users/{{.UserID}}">by {{.DisplayName}}</a></p>
                         </div>
                     </div>
                     {{end}}

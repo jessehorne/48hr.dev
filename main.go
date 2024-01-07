@@ -30,6 +30,7 @@ func main() {
 	r.POST("/projects", mb.DiscordAuthMiddleware, mb.PostProject)
 	r.POST("/projects/:id", mb.DiscordAuthMiddleware, mb.UpdateProject)
 	r.GET("/projects/:id/delete", mb.DiscordAuthMiddleware, mb.DeleteProject)
+	r.GET("/projects/:id/start", mb.DiscordAuthMiddleware, mb.GetStart)
 	r.GET("/projects/:id/apply/:which", mb.DiscordAuthMiddleware, mb.GetApply)
 	r.GET("/projects/:id/approve/:applicantID/:applicantUsername", mb.DiscordAuthMiddleware, mb.GetApprove)
 	r.GET("/projects/:id/deny/:applicantID", mb.DiscordAuthMiddleware, mb.GetDeny)
@@ -45,6 +46,7 @@ func main() {
 	r.GET("/", mb.GetIndex)
 	r.GET("/login", mb.GetLogin)
 	r.GET("/post", mb.GetPost)
+	r.GET("/users/:id", mb.GetUserProfile)
 	r.GET("/users/:id/projects", mb.GetUserProjects)
 	r.GET("/auth/callback", mb.GetAuthCallback)
 

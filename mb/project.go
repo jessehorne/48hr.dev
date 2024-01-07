@@ -21,6 +21,8 @@ type Project struct {
 	LookingFor []string `form:"LookingFor[]"`
 	Applicants []Applicant `json:"applicants"`
 	Members []Member `json:"members"`
+	Started bool
+	StartedAt time.Time
 }
 
 type UserProject struct {
@@ -98,7 +100,7 @@ func PostProject(c *gin.Context) {
 		return
 	}
 	
-	c.Redirect(http.StatusFound, "/")
+	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
 }
 
 func UpdateProject(c *gin.Context) {
@@ -292,6 +294,44 @@ func GetRemove(c *gin.Context) {
 			if err != nil {
 				// TODO
 			}
+		}
+	}
+
+	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+}
+
+func GetStart(c *gin.Context) {
+	userID, err := c.Cookie("user_id")
+	if err != nil {
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return
+	}
+	
+	id := c.Param("id")
+
+	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
+	if err != nil {
+		return
+	}
+
+	for _, p := range posts {
+		var newP *Project
+		p.DataTo(&newP)
+
+		if newP.UserID == userID && !newP.Started {
+			newP.Started = true
+			newP.StartedAt = time.Now()
+
+			po := StoreClient.Collection("posts").Doc(p.Ref.ID)
+			_, err := po.Update(context.Background(), []firestore.Update{
+				{Path: "Started", Value: newP.Started},
+				{Path: "StartedAt", Value: newP.StartedAt},
+			})
+			if err != nil {
+				// TODO
+			}
+			
+			break
 		}
 	}
 
