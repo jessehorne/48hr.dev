@@ -14,6 +14,7 @@ type User struct {
 	ID string
 	Description string
 	CreatedAt time.Time
+	EnglishCreatedAt string
 }
 
 func NewUser(id, desc, discordJSON string) *User {

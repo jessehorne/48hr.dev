@@ -60,6 +60,7 @@ func GetUserProfile(c *gin.Context) {
 		}
 		break
 	}
+	user.EnglishCreatedAt = timeago.English.Format(user.CreatedAt)
 
 	// get projects
 	ps, err := StoreClient.Collection("posts").
