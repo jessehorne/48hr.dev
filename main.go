@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jessehorne/microblog/mb"
 	"github.com/joho/godotenv"
@@ -21,11 +24,28 @@ func main() {
 
 	r := gin.Default()
 
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"https://localhost:8080", "https://48hr.dev"},
+		AllowMethods:     []string{"PUT", "PATCH", "POST", "GET"},
+		AllowHeaders:     []string{"Origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
+		MaxAge: 12 * time.Hour,
+	}))
+
 	// load html templates
 	r.LoadHTMLGlob("templates/*")
 
 	// service ./public/* to the "/" route
 	r.NoRoute(gin.WrapH(http.FileServer(gin.Dir("public", false))))
+	//r.GET("/css/style.css", func(c *gin.Context) {
+	//	c.Header("Content-Type", "text/css")
+	//	css, _ := os.ReadFile("./public/css/style.css")
+	//	c.Writer.Write(css)
+	//})
 
 	r.POST("/projects", mb.DiscordAuthMiddleware, mb.PostProject)
 	r.POST("/projects/:id", mb.DiscordAuthMiddleware, mb.UpdateProject)
@@ -57,6 +77,10 @@ func main() {
 	})
 
 	port := os.Getenv("APP_PORT")
+	key := os.Getenv("SSL_KEY")
+	cert := os.Getenv("SSL_CERT")
 
-	r.RunTLS(":"+port, os.Getenv("SSL_CERT"), os.Getenv("SSL_KEY")) // listen and serve on 0.0.0.0:8080
+	fmt.Println(port, key, cert)
+
+	r.RunTLS(":"+port, cert, key) // listen and serve on 0.0.0.0:8080
 }
