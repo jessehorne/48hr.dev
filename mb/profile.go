@@ -20,7 +20,7 @@ func PostProfile(c *gin.Context) {
 	if authed == "true" {
 		isAuthed = true
 	}
-	
+
 	if !isAuthed {
 		c.Redirect(301, "/")
 		return
@@ -31,13 +31,13 @@ func PostProfile(c *gin.Context) {
 		c.Redirect(301, "/")
 		return
 	}
-	
+
 	u := GetUserByID(id)
-	
+
 	desc := c.PostForm("desc")
 	u.Description = desc
 	u.Save()
-	
+
 	c.Redirect(301, "/profile")
 	return
 }
@@ -79,7 +79,10 @@ func GetUserProfile(c *gin.Context) {
 		}
 		newP.EnglishCreatedTime = timeago.English.Format(newP.CreatedAt)
 		newP.EnglishStartedTime = timeago.English.Format(newP.StartedAt)
-		allProjects = append(allProjects, newP)
+
+		if newP.Title != "Centrifuge" {
+			allProjects = append(allProjects, newP)
+		}
 	}
 
 	if err != nil {
@@ -89,9 +92,9 @@ func GetUserProfile(c *gin.Context) {
 		return
 	} else {
 		c.HTML(http.StatusOK, "user.html", DataResponse(c, gin.H{
-			"creds": GetFirebaseClientCredentials(),
+			"creds":    GetFirebaseClientCredentials(),
 			"projects": allProjects,
-			"user": user,
+			"user":     user,
 		}))
 		return
 	}
