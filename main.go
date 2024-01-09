@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jessehorne/microblog/mb"
@@ -15,7 +16,6 @@ func main() {
 		panic(err)
 	}
 
-
 	// Initialize the state of the app that holds info like firebase/firestore/validator/etc
 	mb.InitApp(false)
 
@@ -23,10 +23,10 @@ func main() {
 
 	// load html templates
 	r.LoadHTMLGlob("templates/*")
-	
+
 	// service ./public/* to the "/" route
 	r.NoRoute(gin.WrapH(http.FileServer(gin.Dir("public", false))))
-	
+
 	r.POST("/projects", mb.DiscordAuthMiddleware, mb.PostProject)
 	r.POST("/projects/:id", mb.DiscordAuthMiddleware, mb.UpdateProject)
 	r.GET("/projects/:id/delete", mb.DiscordAuthMiddleware, mb.DeleteProject)
@@ -37,7 +37,7 @@ func main() {
 	r.GET("/projects/:id/remove/:memberID", mb.DiscordAuthMiddleware, mb.GetRemove)
 	//r.GET("/projects/:id/deny/:applicantID", mb.DiscordAuthMiddleware, mb.GetDeny)
 	//r.GET("/projects/:id/disable/:which", mb.DiscordAuthMiddleware, mb.GetDisable)
-	
+
 	r.GET("/profile", mb.DiscordAuthMiddleware, mb.GetProfile)
 	r.POST("/profile", mb.DiscordAuthMiddleware, mb.PostProfile)
 
@@ -56,5 +56,7 @@ func main() {
 		})
 	})
 
-	r.RunTLS("localhost:8080", "./ssl/server-cert.pem", "./ssl/server-key.pem") // listen and serve on 0.0.0.0:8080
+	port := os.Getenv("APP_PORT")
+
+	r.RunTLS("localhost:"+port, "./ssl/server-cert.pem", "./ssl/server-key.pem") // listen and serve on 0.0.0.0:8080
 }
