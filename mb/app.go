@@ -25,9 +25,9 @@ var OAuthConf *oauth2.Config
 
 func InitApp(debug bool) {
 	time.Local = time.UTC
-	
+
 	DebugMode = debug
-	
+
 	Context = context.Background()
 
 	// initialize firebase
@@ -58,7 +58,7 @@ func InitApp(debug bool) {
 	// Ensure you add the redirect url in the application's oauth2 settings
 	// in the discord devs page.
 	conf := &oauth2.Config{
-		RedirectURL: "https://localhost:8080/auth/callback",
+		RedirectURL: os.Getenv("DISCORD_REDIRECT_URI"),
 		// This next 2 lines must be edited before running this.
 		ClientID:     os.Getenv("DISCORD_CLIENT_ID"),
 		ClientSecret: os.Getenv("DISCORD_CLIENT_SECRET"),
