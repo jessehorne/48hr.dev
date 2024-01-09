@@ -58,5 +58,5 @@ func main() {
 
 	port := os.Getenv("APP_PORT")
 
-	r.RunTLS("localhost:"+port, "./ssl/server-cert.pem", "./ssl/server-key.pem") // listen and serve on 0.0.0.0:8080
+	r.RunTLS("127.0.0.1:"+port, "./ssl/server-cert.pem", "./ssl/server-key.pem") // listen and serve on 0.0.0.0:8080
 }
