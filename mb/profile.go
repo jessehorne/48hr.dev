@@ -81,7 +81,9 @@ func GetUserProfile(c *gin.Context) {
 		newP.EnglishStartedTime = timeago.English.Format(newP.StartedAt)
 
 		if newP.Title != "Centrifuge" {
-			allProjects = append(allProjects, newP)
+			if newP.UserID == user.ID {
+				allProjects = append(allProjects, newP)
+			}
 		}
 	}
 
