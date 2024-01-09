@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"io"
 	"math/big"
 	"net/http"
@@ -14,7 +15,7 @@ import (
 
 func DiscordAuthMiddleware(c *gin.Context) {
 	isAuthed, err := c.Cookie("is_authed")
-	
+
 	if isAuthed != "true" || err != nil {
 		c.JSON(http.StatusUnauthorized, []byte("{}"))
 		c.Abort()
@@ -67,7 +68,7 @@ func GetAuthCallback(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "something went really bad with auth",
+			"msg":   "something went really bad with auth",
 			"error": err.Error(),
 		})
 		return
@@ -78,8 +79,8 @@ func GetAuthCallback(c *gin.Context) {
 
 	if err != nil || res.StatusCode != 200 {
 		c.JSON(500, gin.H{
-			"msg": "something went wrong with getting your profile",
-			"error": err.Error(),
+			"msg":    "something went wrong with getting your profile",
+			"error":  err.Error(),
 			"status": res.StatusCode,
 		})
 		return
@@ -89,19 +90,24 @@ func GetAuthCallback(c *gin.Context) {
 
 	d, _ := io.ReadAll(res.Body)
 	//fmt.Println(string(d))
-	
+
 	// set cookie to be used in further auth requests
 	authTimeFor := 86400 * 7 // 7 days
 	c.SetCookie("is_authed", "true", authTimeFor, "/", "localhost", true, true)
-	
+
 	// create/update user in firestore
 	var discUser DiscordUser
 	err = json.Unmarshal(d, &discUser)
 	if err != nil {
 		// TODO
+		fmt.Println(err)
+		return
 	}
 	foundUser := CreateOrUpdateUser(discUser)
+
+	fmt.Println("Creating: ", foundUser.ID)
+
 	c.SetCookie("user_id", foundUser.ID, authTimeFor, "/", "localhost", true, true)
-	
+
 	c.Redirect(http.StatusFound, "/")
 }
