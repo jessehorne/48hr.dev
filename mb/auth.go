@@ -93,7 +93,7 @@ func GetAuthCallback(c *gin.Context) {
 
 	// set cookie to be used in further auth requests
 	authTimeFor := 86400 * 7 // 7 days
-	c.SetCookie("is_authed", "true", authTimeFor, "/", "localhost", true, true)
+	c.SetCookie("is_authed", "true", authTimeFor, "/", os.Getenv("APP_DOMAIN"), true, true)
 
 	// create/update user in firestore
 	var discUser DiscordUser
@@ -107,7 +107,7 @@ func GetAuthCallback(c *gin.Context) {
 
 	fmt.Println("Creating: ", foundUser.ID)
 
-	c.SetCookie("user_id", foundUser.ID, authTimeFor, "/", "localhost", true, true)
+	c.SetCookie("user_id", foundUser.ID, authTimeFor, "/", os.Getenv("APP_DOMAIN"), true, true)
 
 	c.Redirect(http.StatusFound, "/")
 }

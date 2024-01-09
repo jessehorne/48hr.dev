@@ -12,13 +12,13 @@ import (
 func GetIndex(c *gin.Context) {
 	// get projects
 	ps, err := StoreClient.Collection("posts").Documents(context.Background()).GetAll()
-	
+
 	var allProjects []*Project
 	for _, p := range ps {
 		var newP *Project
 		err := p.DataTo(&newP)
 		newP.EnglishTime = timeago.English.Format(newP.CreatedAt)
-		
+
 		if err != nil {
 			// TODO
 		}
@@ -30,15 +30,15 @@ func GetIndex(c *gin.Context) {
 
 	if err != nil {
 		c.HTML(http.StatusOK, "index.html", DataResponse(c, gin.H{
-			"creds": GetFirebaseClientCredentials(),
+			"creds":   GetFirebaseClientCredentials(),
 			"discord": os.Getenv("DISCORD_URL"),
 		}))
 		return
 	} else {
 		c.HTML(http.StatusOK, "index.html", DataResponse(c, gin.H{
-			"creds": GetFirebaseClientCredentials(),
+			"creds":    GetFirebaseClientCredentials(),
 			"projects": allProjects,
-			"discord": os.Getenv("DISCORD_URL"),
+			"discord":  os.Getenv("DISCORD_URL"),
 		}))
 		return
 	}
@@ -57,8 +57,8 @@ func GetPost(c *gin.Context) {
 }
 
 func GetLogout(c *gin.Context) {
-	c.SetCookie("is_authed", "false", -1, "/", "localhost", true, true)
-	c.SetCookie("discord_user", "", -1, "/", "localhost", true, true)
+	c.SetCookie("is_authed", "false", -1, "/", os.Getenv("APP_DOMAIN"), true, true)
+	c.SetCookie("discord_user", "", -1, "/", os.Getenv("APP_DOMAIN"), true, true)
 
 	c.Redirect(http.StatusFound, "/")
 }
@@ -82,7 +82,7 @@ func GetUserProjects(c *gin.Context) {
 		if err != nil {
 			// TODO
 		}
-		
+
 		for _, ms := range newP.Members {
 			if ms.ID == id {
 				var needsBackend, needsFrontend, needsInfra bool
@@ -98,11 +98,11 @@ func GetUserProjects(c *gin.Context) {
 
 				if newP.Title != "Centrifuge" {
 					allProjects = append(allProjects, &UserProject{
-						Project: newP,
-						NeedsBackend: needsBackend,
-						NeedsFrontend: needsFrontend,
-						NeedsInfra: needsInfra,
-						EnglishStartTime: timeago.English.Format(newP.StartedAt),
+						Project:            newP,
+						NeedsBackend:       needsBackend,
+						NeedsFrontend:      needsFrontend,
+						NeedsInfra:         needsInfra,
+						EnglishStartTime:   timeago.English.Format(newP.StartedAt),
 						EnglishCreatedTime: timeago.English.Format(newP.CreatedAt),
 					})
 				}
@@ -117,7 +117,7 @@ func GetUserProjects(c *gin.Context) {
 		return
 	} else {
 		c.HTML(http.StatusOK, "projects.html", DataResponse(c, gin.H{
-			"creds": GetFirebaseClientCredentials(),
+			"creds":    GetFirebaseClientCredentials(),
 			"projects": allProjects,
 		}))
 		return
