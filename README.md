@@ -1,7 +1,7 @@
-Centrifuge
+48hr.dev
 ===
 
-The official website for Centrifuge written in Go and built with Tailwind.
+48hr.dev written in Go and built with Tailwind.
 
 more coming soon...
 
