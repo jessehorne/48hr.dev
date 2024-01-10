@@ -14,7 +14,7 @@ func GetApply(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 		return
 	}
-	
+
 	u := GetUserByID(userID)
 
 	which := c.Param("which")
@@ -23,7 +23,7 @@ func GetApply(c *gin.Context) {
 	newApplicant := Applicant{
 		ID:          userID,
 		DisplayName: u.DiscordUser.Username,
-		Which: which,
+		Which:       which,
 	}
 
 	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
@@ -34,14 +34,26 @@ func GetApply(c *gin.Context) {
 	for _, p := range posts {
 		var newP *Project
 		p.DataTo(&newP)
-		newP.Applicants = append(newP.Applicants, newApplicant)
 
-		po := StoreClient.Collection("posts").Doc(p.Ref.ID)
-		_, err := po.Update(context.Background(), []firestore.Update{
-			{Path: "Applicants", Value: newP.Applicants},
-		})
-		if err != nil {
-			// TODO
+		// only add to list of applicants if it isn't already in there
+		var found bool
+		for _, a := range newP.Applicants {
+			if a.ID == userID && a.Which == which {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			newP.Applicants = append(newP.Applicants, newApplicant)
+
+			po := StoreClient.Collection("posts").Doc(p.Ref.ID)
+			_, err := po.Update(context.Background(), []firestore.Update{
+				{Path: "Applicants", Value: newP.Applicants},
+			})
+			if err != nil {
+				// TODO
+			}
 		}
 	}
 
@@ -75,7 +87,6 @@ func GetDisable(c *gin.Context) {
 				break
 			}
 		}
-
 
 		if newP.UserID == u.ID {
 			po := StoreClient.Collection("posts").Doc(p.Ref.ID)
