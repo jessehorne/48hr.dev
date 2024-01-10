@@ -5,13 +5,15 @@ import (
 	"net/http"
 	"os"
 
+	"cloud.google.com/go/firestore"
 	"github.com/gin-gonic/gin"
 	"github.com/xeonx/timeago"
 )
 
 func GetIndex(c *gin.Context) {
 	// get projects
-	ps, err := StoreClient.Collection("posts").Documents(context.Background()).GetAll()
+	ps, err := StoreClient.Collection("posts").OrderBy("CreatedAt", firestore.Desc).
+		Documents(context.Background()).GetAll()
 
 	var allProjects []*Project
 	for _, p := range ps {
