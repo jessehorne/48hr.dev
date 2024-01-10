@@ -110,5 +110,5 @@ func GetAuthCallback(c *gin.Context) {
 
 	c.SetCookie("user_id", foundUser.ID, authTimeFor, "/", os.Getenv("APP_DOMAIN"), true, true)
 
-	c.Redirect(http.StatusFound, "/")
+	c.Redirect(http.StatusFound, "/profile?a=1")
 }
