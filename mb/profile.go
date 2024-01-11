@@ -3,6 +3,7 @@ package mb
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xeonx/timeago"
@@ -80,8 +81,16 @@ func GetUserProfile(c *gin.Context) {
 		newP.EnglishCreatedTime = timeago.English.Format(newP.CreatedAt)
 		newP.EnglishStartedTime = timeago.English.Format(newP.StartedAt)
 
+		if len(newP.Tags) > 0 {
+			splitted := strings.Split(newP.Tags, ",")
+			for _, s := range splitted {
+				newP.FormattedTags = append(newP.FormattedTags, s)
+			}
+		}
+
 		if newP.Title != "Centrifuge" {
 			if newP.UserID == user.ID {
+				// only add if its not the first doc and it belongs to the user
 				allProjects = append(allProjects, newP)
 			}
 		}

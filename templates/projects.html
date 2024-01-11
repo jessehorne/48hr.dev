@@ -52,6 +52,12 @@
                                 <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Looking for Infrastructure</span>
                             </label>
                         </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="title">
+                                Tags <i>(example: "golang,tailwind,anarchism")</i>
+                            </label>
+                            <input name="Tags" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="golang,tailwind,anarchism,space" value="{{.Project.Tags}}">
+                        </div>
                         <div class="flex items-center justify-between">
                             <button type="submit" class="bg-blue hover:bg-blue text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                                 Update Project

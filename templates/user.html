@@ -103,6 +103,13 @@
                         {{end}}
 
                         <p class="mb-3 font-normal mt-4"><a href="/users/{{.UserID}}">by {{.DisplayName}}</a></p>
+                        {{ if .FormattedTags }}
+                        <div class="w-full flex flex-row">
+                            {{ range .FormattedTags}}
+                            <div class="rounded bg-blue m-2 p-2 rounded-full">{{ . }}</div>
+                            {{end}}
+                        </div>
+                        {{end}}
                     </div>
                 </div>
                 {{end}}

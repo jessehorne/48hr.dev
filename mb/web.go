@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/firestore"
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,13 @@ func GetIndex(c *gin.Context) {
 
 		if err != nil {
 			// TODO
+		}
+
+		if len(newP.Tags) > 0 {
+			splitted := strings.Split(newP.Tags, ",")
+			for _, s := range splitted {
+				newP.FormattedTags = append(newP.FormattedTags, s)
+			}
 		}
 
 		if newP.Title != "Centrifuge" {

@@ -12,70 +12,74 @@ import (
 )
 
 type Project struct {
-	ProjectID string `json:"uuid"`
-	UserID string `json:"userID"`
-	DisplayName string `json:"displayName"`
-	CreatedAt time.Time `json:"createdAt"`
-	EnglishTime string
-	Title string `json:"title"`
-	Short string `json:"short"`
-	LookingFor []string `form:"LookingFor[]"`
-	Applicants []Applicant `json:"applicants"`
-	Members []Member `json:"members"`
-	Started bool
-	StartedAt time.Time
+	ProjectID          string    `json:"uuid"`
+	UserID             string    `json:"userID"`
+	DisplayName        string    `json:"displayName"`
+	CreatedAt          time.Time `json:"createdAt"`
+	EnglishTime        string
+	Title              string      `json:"title"`
+	Short              string      `json:"short"`
+	LookingFor         []string    `form:"LookingFor[]"`
+	Applicants         []Applicant `json:"applicants"`
+	Members            []Member    `json:"members"`
+	Started            bool
+	StartedAt          time.Time
 	EnglishCreatedTime string
 	EnglishStartedTime string
+	Tags               string
+	FormattedTags      []string
 }
 
 type UserProject struct {
-	Project *Project
-	NeedsBackend bool
-	NeedsFrontend bool
-	NeedsInfra bool
-	EnglishStartTime string
+	Project            *Project
+	NeedsBackend       bool
+	NeedsFrontend      bool
+	NeedsInfra         bool
+	EnglishStartTime   string
 	EnglishCreatedTime string
 }
 
 type Applicant struct {
-	ID string `json:"id"`
+	ID          string `json:"id"`
 	DisplayName string `json:"displayName"`
-	Which string `json:"which"` // frontend, backend or infra
+	Which       string `json:"which"` // frontend, backend or infra
 }
 
 type Member struct {
-	ID string `json:"id"`
+	ID          string `json:"id"`
 	DisplayName string `json:"displayName"`
 }
 
 type ProjectRequest struct {
-	Title string `json:"title"`
-	Short string `json:"short"`
-	LookingFor []string `form:"LookingFor[]"`
+	Title      string
+	Short      string
+	LookingFor []string
+	Tags       string
 }
 
 func NewProject(userID string, pr *ProjectRequest) *Project {
 	u := GetUserByID(userID)
-	
+
 	if u == nil {
 		return nil
 	}
-	
+
 	return &Project{
-		ProjectID: uuid.New().String(),
-		UserID: userID,
+		ProjectID:   uuid.New().String(),
+		UserID:      userID,
 		DisplayName: u.DiscordUser.Username,
-		CreatedAt: time.Now(),
-		Title: pr.Title,
-		Short: pr.Short,
-		LookingFor: pr.LookingFor,
-		Applicants: []Applicant{},
+		CreatedAt:   time.Now(),
+		Title:       pr.Title,
+		Short:       pr.Short,
+		LookingFor:  pr.LookingFor,
+		Applicants:  []Applicant{},
 		Members: []Member{
 			{
-				ID: u.ID,
+				ID:          u.ID,
 				DisplayName: u.DiscordUser.Username,
 			},
 		},
+		Tags: pr.Tags,
 	}
 }
 
@@ -89,23 +93,23 @@ func PostProject(c *gin.Context) {
 		}))
 		return
 	}
-	
+
 	userID, err := c.Cookie("user_id")
 	if err != nil {
 		fmt.Println("couldn't find user")
 		return
 	}
-	
+
 	newProj := NewProject(userID, &projRequest)
-	
+
 	// add to collection
 	_, _, err = StoreClient.Collection("posts").Add(context.Background(), newProj)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	
-	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+
+	c.Redirect(http.StatusFound, "/users/"+userID+"/projects")
 }
 
 func UpdateProject(c *gin.Context) {
@@ -126,7 +130,7 @@ func UpdateProject(c *gin.Context) {
 	}
 
 	id := c.Param("id")
-	
+
 	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
 	if err != nil {
 		return
@@ -138,10 +142,11 @@ func UpdateProject(c *gin.Context) {
 			{Path: "Title", Value: projRequest.Title},
 			{Path: "Short", Value: projRequest.Short},
 			{Path: "LookingFor", Value: projRequest.LookingFor},
+			{Path: "Tags", Value: projRequest.Tags},
 		})
 	}
 
-	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+	c.Redirect(http.StatusFound, "/users/"+userID+"/projects")
 }
 
 func DeleteProject(c *gin.Context) {
@@ -153,7 +158,7 @@ func DeleteProject(c *gin.Context) {
 	}
 
 	id := c.Param("id")
-	
+
 	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
 	if err != nil {
 		return
@@ -162,12 +167,12 @@ func DeleteProject(c *gin.Context) {
 	for _, p := range posts {
 		var newP *Project
 		p.DataTo(&newP)
-		
+
 		StoreClient.Collection("posts").Doc(p.Ref.ID).Delete(context.Background())
 		break
 	}
 
-	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+	c.Redirect(http.StatusFound, "/users/"+userID+"/projects")
 }
 
 func GetApprove(c *gin.Context) {
@@ -193,7 +198,7 @@ func GetApprove(c *gin.Context) {
 		p.DataTo(&newP)
 
 		newP.Members = append(newP.Members, Member{
-			ID: applicantID,
+			ID:          applicantID,
 			DisplayName: applicantUsername,
 		})
 
@@ -203,7 +208,7 @@ func GetApprove(c *gin.Context) {
 				break
 			}
 		}
-		
+
 		if newP.UserID == u.ID {
 			po := StoreClient.Collection("posts").Doc(p.Ref.ID)
 			_, err := po.Update(context.Background(), []firestore.Update{
@@ -218,7 +223,7 @@ func GetApprove(c *gin.Context) {
 		}
 	}
 
-	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+	c.Redirect(http.StatusFound, "/users/"+userID+"/projects")
 }
 
 func GetDeny(c *gin.Context) {
@@ -260,7 +265,7 @@ func GetDeny(c *gin.Context) {
 		}
 	}
 
-	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+	c.Redirect(http.StatusFound, "/users/"+userID+"/projects")
 }
 
 func GetRemove(c *gin.Context) {
@@ -302,7 +307,7 @@ func GetRemove(c *gin.Context) {
 		}
 	}
 
-	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+	c.Redirect(http.StatusFound, "/users/"+userID+"/projects")
 }
 
 func GetStart(c *gin.Context) {
@@ -311,7 +316,7 @@ func GetStart(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 		return
 	}
-	
+
 	id := c.Param("id")
 
 	posts, err := StoreClient.Collection("posts").Where("ProjectID", "==", id).Documents(context.Background()).GetAll()
@@ -335,10 +340,10 @@ func GetStart(c *gin.Context) {
 			if err != nil {
 				// TODO
 			}
-			
+
 			break
 		}
 	}
 
-	c.Redirect(http.StatusFound, "/users/" + userID + "/projects")
+	c.Redirect(http.StatusFound, "/users/"+userID+"/projects")
 }
