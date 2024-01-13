@@ -88,10 +88,11 @@
 
                             {{end}}
 
+
                             {{ if .FormattedTags }}
-                            <div class="w-full flex flex-row">
+                            <div class="w-full flex flex-row mt-4">
                                 {{ range .FormattedTags}}
-                                    <div class="rounded bg-blue m-2 p-2 rounded-full">{{ . }}</div>
+                                    <div class="bg-blue text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue dark:text-white">{{ . }}</div>
                                 {{end}}
                             </div>
                             {{end}}

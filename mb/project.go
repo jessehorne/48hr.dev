@@ -53,7 +53,7 @@ type Member struct {
 type ProjectRequest struct {
 	Title      string
 	Short      string
-	LookingFor []string
+	LookingFor []string `form:"LookingFor[]"`
 	Tags       string
 }
 
@@ -135,6 +135,8 @@ func UpdateProject(c *gin.Context) {
 	if err != nil {
 		return
 	}
+
+	fmt.Println(projRequest.LookingFor)
 
 	for _, p := range posts {
 		po := StoreClient.Collection("posts").Doc(p.Ref.ID)
