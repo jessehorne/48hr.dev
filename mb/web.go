@@ -2,6 +2,7 @@ package mb
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -74,7 +75,15 @@ func GetLogout(c *gin.Context) {
 }
 
 func GetUserProjects(c *gin.Context) {
+	userID, _ := c.Cookie("user_id")
 	id := c.Param("id")
+
+	fmt.Println(userID)
+	fmt.Println(id)
+	if userID != id {
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return
+	}
 
 	if id == "" {
 		return

@@ -139,6 +139,14 @@ func UpdateProject(c *gin.Context) {
 	fmt.Println(projRequest.LookingFor)
 
 	for _, p := range posts {
+		var proj Project
+		p.DataTo(&proj)
+
+		if proj.UserID != userID {
+			c.Redirect(http.StatusTemporaryRedirect, "/")
+			return
+		}
+
 		po := StoreClient.Collection("posts").Doc(p.Ref.ID)
 		po.Update(context.Background(), []firestore.Update{
 			{Path: "Title", Value: projRequest.Title},
@@ -169,6 +177,11 @@ func DeleteProject(c *gin.Context) {
 	for _, p := range posts {
 		var newP *Project
 		p.DataTo(&newP)
+
+		if newP.UserID != userID {
+			c.Redirect(http.StatusTemporaryRedirect, "/")
+			return
+		}
 
 		StoreClient.Collection("posts").Doc(p.Ref.ID).Delete(context.Background())
 		break
